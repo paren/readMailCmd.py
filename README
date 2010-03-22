@@ -1,9 +1,10 @@
-This script reads mail subject via POP3, if contains the string "Cmd=", executes the next part of the string, 
-for example, "Cmd=ping www.google.com", the program execute the ping command and the output send via SMTP to 
-the sender of the mail.
+This script reads the subject of a mail via POP3, if contains the string "Cmd=", executes the next part of the
+string, for example, "Cmd=ping www.google.com", the program execute the ping command and sends the output via 
+SMTP to the sender of the mail.
 
 TODO: 
-Handle exceptions, add security for example: Never execute arbitrary commands like shutdown or ftp command to 
+*Manage exceptions.
+*Add security for example: never execute arbitrary commands like shutdown or ftp command to 
 download malware, etc.
 
 
