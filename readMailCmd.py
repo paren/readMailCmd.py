@@ -11,7 +11,6 @@ class RMC:
     def __init__(self):
         self.mailServer = {"smtp" : "smtp.gmail.com", "sPort" : 587, "pop" : "pop.gmail.com", "pPort" : 995}
         self.mailAccount = {"login" : "readmail.py@gmail.com", "pass" : "Your-password-here"}
-        self.mailConf = {"fromAddrs" : "readmail.py@gmail.com"}
         self.subj = re.compile("Subject: ")
         self.fromM = re.compile("From: ")
         
@@ -22,8 +21,8 @@ class RMC:
         smtp.starttls()
         smtp.ehlo()
         smtp.login(self.mailAccount["login"], self.mailAccount["pass"])
-        msg = ("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s\r\n") % (self.mailConf["fromAddrs"], toAddr, subject, message)
-        smtp.sendmail(self.mailConf["fromAddrs"], toAddr, msg)
+        msg = ("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s\r\n") % (self.mailAccount["login"], toAddr, subject, message)
+        smtp.sendmail(self.mailAccount["login"], toAddr, msg)
         smtp.quit()
         
     def readMail(self):
@@ -34,18 +33,20 @@ class RMC:
         numMessages = pop.stat()[0]
         for i in range(numMessages):
             for line in pop.retr(i + 1)[1]:
+                print line
                 fro = re.findall(self.fromM, line)
                 sub = re.findall(self.subj, line)
                 if fro:
                     toAddr = line.split(": ")[1]
                 if sub:
-                    print line
                     if len(line.split(": ")) > 1:
                         isCmd = line.split(": ")[1]
                         if isCmd.split("=")[0] == "Cmd":
                             start = time.ctime()
-                            cmd = os.popen(isCmd.split("=")[1], "r")
-                            self.sendMail(isCmd.split("=")[1], toAddr, start + "\r\n\r\n" + cmd.read() + time.ctime())
+                            cmdStr = isCmd.split("=")[1]
+                            cmd = os.popen(cmdStr, "r")
+            if cmdStr:
+                self.sendMail(cmdStr, toAddr, start + "\r\n\r\n" + cmd.read() + "\r\n\r\n" + time.ctime())
         pop.quit()
 
 rmc = RMC()
